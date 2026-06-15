@@ -1,0 +1,36 @@
+name: Bug report
+description: Something isn't working as expected
+title: "[bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, including jleak output if relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Create a file with ...
+        2. Run jleak scan .
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: jleak version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Java / OS
+      placeholder: "Temurin 21 / macOS 14"
+    validations:
+      required: false

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "toolVersion": "0.1.0",
+  "findings": [
+    {
+      "detector": "aws-access-key-id",
+      "title": "AWS Access Key ID",
+      "severity": "CRITICAL",
+      "path": "config.txt",
+      "line": 1,
+      "column": 21,
+      "preview": "AKIA********...",
+      "entropy": 0.0
+    },
+    {
+      "detector": "github-token",
+      "title": "GitHub Token",
+      "severity": "HIGH",
+      "path": "config.txt",
+      "line": 2,
+      "column": 16,
+      "preview": "ghp_********...",
+      "entropy": 0.0
+    }
+  ],
+  "stats": {
+    "findings": 2,
+    "filesScanned": 1,
+    "skipped": 0,
+    "bytes": 96,
+    "errors": 0
+  },
+  "truncated": false
+}

@@ -1,0 +1,24 @@
+name: 'jleak secret scanner'
+description: 'Catch leaked secrets before they reach your git history'
+branding:
+  icon: 'shield'
+  color: 'purple'
+inputs:
+  path:
+    description: 'Directory path to scan (defaults to repository root)'
+    required: false
+    default: '.'
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Java 21 for jleak
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+    - name: Run jleak scan
+      shell: bash
+      run: |
+        cd ${{ github.action_path }}
+        chmod +x gradlew
+        ./gradlew run --quiet --args="scan ${{ github.workspace }}/${{ inputs.path }}"

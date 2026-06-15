@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# jleak pre-commit hook — blocks commits that contain secrets.
+#
+# Install:
+#   ./gradlew installDist
+#   cp hooks/pre-commit .git/hooks/pre-commit
+#   chmod +x .git/hooks/pre-commit
+#
+set -e
+ROOT="$(git rev-parse --show-toplevel)"
+LAUNCHER="$ROOT/build/install/jleak/bin/jleak"
+
+if [ ! -x "$LAUNCHER" ]; then
+    echo "jleak: launcher not found at $LAUNCHER" >&2
+    echo "jleak: run './gradlew installDist' first" >&2
+    exit 1
+fi
+
+exec "$LAUNCHER" pre-commit

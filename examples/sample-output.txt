@@ -1,0 +1,5 @@
+$ jleak scan .
+
+CRITICAL AWS Access Key ID         config.txt:1:21  AKIA********...  (entropy=0.00)
+HIGH     GitHub Token              config.txt:2:16  ghp_********...  (entropy=0.00)
+2 finding(s) | files scanned: 1 | skipped: 0 | bytes: 96 | errors: 0
