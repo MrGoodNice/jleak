@@ -47,10 +47,7 @@ public final class EntropyDetector implements Detector {
             double entropy = ShannonEntropy.of(s, start, end, ctx.entropyCounts, ctx.entropyTouched);
             if (entropy >= minEntropy) {
                 String redacted = Finding.redact(s, start, end);
-                // column is 1-based, hence + 1 on top of the line's offset.
-                sink.report(new Finding(SecretType.GENERIC_HIGH_ENTROPY,
-                        SecretType.GENERIC_HIGH_ENTROPY.defaultSeverity(),
-                        ctx.file, ctx.lineNumber, ctx.columnOffset + start + 1, len, redacted, entropy));
+                sink.report(Finding.from(SecretType.GENERIC_HIGH_ENTROPY, ctx, start, len, redacted, entropy));
             }
         }
     }

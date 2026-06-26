@@ -1,6 +1,7 @@
 package dev.jleak.engine;
 
 import dev.jleak.detect.LineContext;
+import dev.jleak.util.BinaryDetection;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,21 +63,9 @@ public final class WorkerContext {
         return total;
     }
 
-    /** Binary sniff: a NUL byte is a hard yes; otherwise fall back to the non-printable ratio over the sniff window. */
+    /** Binary sniff: delegates to the shared {@link BinaryDetection} utility. */
     public boolean looksBinary(int byteCount) {
-        int sniff = Math.min(byteCount, cfg.binarySniffBytes());
-        if (sniff == 0) return false;
-        int nonPrintable = 0;
-        for (int i = 0; i < sniff; i++) {
-            int b = byteBuffer[i] & 0xFF;
-            if (b == 0x00) return true;
-            // DEL and the control range count as non-printable, but tab/newline/CR
-            // are perfectly normal in text and don't.
-            if (b == 0x7F || (b < 0x20 && b != '\t' && b != '\n' && b != '\r')) {
-                nonPrintable++;
-            }
-        }
-        return ((double) nonPrintable / sniff) > cfg.binaryNonPrintableRatio();
+        return BinaryDetection.looksBinary(byteBuffer, byteCount, cfg.binarySniffBytes(), cfg.binaryNonPrintableRatio());
     }
 
     /** Decodes the first byteCount bytes as UTF-8 into a flipped, ready-to-read CharBuffer. */

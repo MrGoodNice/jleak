@@ -35,4 +35,9 @@ public final class LineContext {
         this.view.set(chars, offset, length);
         return this;
     }
+
+    /** Converts a 0-based match start within the line view to a 1-based column. */
+    public int column(int matchStart) {
+        return columnOffset + matchStart + 1;
+    }
 }

@@ -69,9 +69,7 @@ public final class RegexDetector implements Detector {
                 if (entropy < minEntropy) continue;
             }
             String redacted = Finding.redact(view, start, end);
-            // column is 1-based: offset of the chunk + match start + 1.
-            sink.report(new Finding(type, type.defaultSeverity(), ctx.file, ctx.lineNumber,
-                    ctx.columnOffset + start + 1, end - start, redacted, entropy));
+            sink.report(Finding.from(type, ctx, start, end - start, redacted, entropy));
         }
     }
 

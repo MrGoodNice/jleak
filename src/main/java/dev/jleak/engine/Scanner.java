@@ -195,8 +195,7 @@ public final class Scanner {
         // PEM BEGIN line: report the block once, then enter "inside" mode.
         if (Sequences.indexOfIgnoreCaseLowerNeedle(view, "begin") >= 0
                 && Sequences.indexOfIgnoreCaseLowerNeedle(view, "private key") >= 0) {
-            sink.report(new Finding(SecretType.PEM_PRIVATE_KEY,
-                    SecretType.PEM_PRIVATE_KEY.defaultSeverity(), file, lineNumber, columnOffset + 1, len,
+            sink.report(Finding.from(SecretType.PEM_PRIVATE_KEY, ctx, 0, len,
                     "[PEM PRIVATE KEY]", 0.0));
             return true;
         }
