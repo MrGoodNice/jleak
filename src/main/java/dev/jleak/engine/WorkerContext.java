@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -89,8 +90,25 @@ public final class WorkerContext {
         }
         CharBuffer out = CharBuffer.wrap(charBuffer);
         decoder.reset();
-        decoder.decode(in, out, true);
-        decoder.flush(out);
+        CoderResult decodeResult = decoder.decode(in, out, true);
+        if (decodeResult.isOverflow()) {
+            // Should not happen given our sizing, but grow and retry rather
+            // than silently returning a truncated buffer.
+            charBuffer = new char[charBuffer.length * 2];
+            out = CharBuffer.wrap(charBuffer);
+            in.rewind();
+            decoder.reset();
+            decoder.decode(in, out, true);
+        }
+        CoderResult flushResult = decoder.flush(out);
+        if (flushResult.isOverflow()) {
+            charBuffer = new char[charBuffer.length * 2];
+            out = CharBuffer.wrap(charBuffer);
+            in.rewind();
+            decoder.reset();
+            decoder.decode(in, out, true);
+            decoder.flush(out);
+        }
         out.flip();
         return out;
     }

@@ -100,9 +100,17 @@ public final class Scanner {
             for (Future<?> t : tasks) {
                 try {
                     t.get();
-                } catch (Exception e) {
-                    System.err.println("jleak: worker failed (" + e.getMessage() + ")");
+                } catch (java.util.concurrent.ExecutionException e) {
+                    // Unwrap ExecutionException to surface the actual cause;
+                    // e.getMessage() alone just prints the wrapper class name.
+                    Throwable cause = e.getCause() != null ? e.getCause() : e;
+                    System.err.println("jleak: worker failed (" + cause.getMessage() + ")");
                     stats.error();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    System.err.println("jleak: scan interrupted");
+                    stats.error();
+                    break;
                 }
             }
         } finally {

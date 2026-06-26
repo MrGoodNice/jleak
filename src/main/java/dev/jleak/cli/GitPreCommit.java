@@ -63,6 +63,7 @@ public final class GitPreCommit {
                 filesScanned++;
             } catch (Exception e) {
                 // One unreadable blob shouldn't sink the whole hook.
+                System.err.println("jleak: failed to read staged blob for " + path + " (" + e.getMessage() + ")");
                 errors++;
             }
         }
@@ -86,6 +87,7 @@ public final class GitPreCommit {
             byte[] out = exec(new String[]{"git", "cat-file", "-s", ref});
             return Long.parseLong(new String(out, StandardCharsets.UTF_8).trim());
         } catch (Exception e) {
+            System.err.println("jleak: failed to stat blob " + ref + " (" + e.getMessage() + ")");
             return -1;
         }
     }
@@ -131,12 +133,22 @@ public final class GitPreCommit {
         pb.redirectErrorStream(false);
         Process p = pb.start();
         byte[] data;
-        try (InputStream in = p.getInputStream()) {
+        byte[] errData;
+        // Drain both stdout and stderr to prevent deadlock when the child
+        // process writes more than the OS pipe buffer can hold on stderr.
+        try (InputStream in = p.getInputStream();
+             InputStream err = p.getErrorStream()) {
             data = readAll(in);
+            errData = readAll(err);
         }
         int code = p.waitFor();
         if (code != 0) {
-            throw new IllegalStateException("command failed (" + code + "): " + String.join(" ", command));
+            String errMsg = new String(errData, StandardCharsets.UTF_8).trim();
+            String detail = errMsg.isEmpty()
+                    ? "exit code " + code
+                    : errMsg;
+            throw new IllegalStateException(
+                    "command failed (" + code + "): " + String.join(" ", command) + " — " + detail);
         }
         return data;
     }
