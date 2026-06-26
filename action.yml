@@ -18,7 +18,11 @@ runs:
         java-version: '21'
     - name: Run jleak scan
       shell: bash
+      env:
+        SCAN_PATH: ${{ inputs.path }}
+        ACTION_PATH: ${{ github.action_path }}
+        WORKSPACE: ${{ github.workspace }}
       run: |
-        cd ${{ github.action_path }}
+        cd "${ACTION_PATH}"
         chmod +x gradlew
-        ./gradlew run --quiet --args="scan ${{ github.workspace }}/${{ inputs.path }}"
+        ./gradlew run --quiet --args="scan ${WORKSPACE}/${SCAN_PATH}"
