@@ -1,5 +1,7 @@
 package dev.jleak.model;
 
+import dev.jleak.detect.LineContext;
+
 import java.nio.file.Path;
 
 /**
@@ -32,6 +34,16 @@ public record Finding(
         if (c != 0) return c;
         // Final tiebreaker for deterministic ordering.
         return Integer.compare(type.ordinal(), o.type.ordinal());
+    }
+
+    /**
+     * Creates a finding from a detector match, using the type's default severity
+     * and deriving the 1-based column from the {@link LineContext}.
+     */
+    public static Finding from(SecretType type, LineContext ctx, int matchStart, int length,
+                                String redacted, double entropy) {
+        return new Finding(type, type.defaultSeverity(), ctx.file, ctx.lineNumber,
+                ctx.column(matchStart), length, redacted, entropy);
     }
 
     /**
